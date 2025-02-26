@@ -22,6 +22,8 @@ services:
       - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
     ports:
       - "9092:9092"
+    volumes:
+      - shared_data:/data  # Shared volume
 
   flink-jobmanager:
     image: flink:latest
@@ -31,6 +33,8 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
     ports:
       - "8081:8081"
+    volumes:
+      - shared_data:/data
 
   flink-taskmanager:
     image: flink:latest
@@ -40,6 +44,8 @@ services:
       - flink-jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+    volumes:
+      - shared_data:/data 
 
   pulsar:
     image: apachepulsar/pulsar:latest
@@ -48,6 +54,8 @@ services:
     ports:
       - "6650:6650"
       - "8080:8080"
+    volumes:
+      - shared_data:/data
 
   benchmarker:
     image: python:3.9
@@ -60,5 +68,9 @@ services:
     - type: bind
       source: ./benchmark
       target: /benchmark
+    - shared_data:/data 
     working_dir: /benchmark
     command: ["python", "benchmark.py"]
+
+volumes:
+  shared_data:
