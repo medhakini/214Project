@@ -11,7 +11,7 @@ FLINK_REST_API = "http://flink-jobmanager:8081"
 NUM_MESSAGES = 10000
 
 def benchmark_kafka():
-    producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER)
+    producer = KafkaProducer(bootstrap_servers=KAFKA_BROKER, api_version=(0,11,5))
     start_time = time.time()
     
     for i in range(NUM_MESSAGES):
