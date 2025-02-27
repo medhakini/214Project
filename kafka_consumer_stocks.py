@@ -23,7 +23,7 @@ consumer = KafkaConsumer(
     topic,
     bootstrap_servers=broker,
     group_id=group,
-    auto_offset_reset='earliest'
+    auto_offset_reset='earliest',
     enable_auto_commit=True
 )
 
