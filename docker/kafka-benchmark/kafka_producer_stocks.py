@@ -4,7 +4,7 @@ import random
 
 
 # requires the docker file to define the topic that each producer will write to
-topic = os.getenv('KAFKA_TOPIC', 'default_topic')
+topic = os.getenv('KAFKA_TOPIC', 'stock_topic')
 
 # requires the docker file to define the broker
 broker = os.getenv('KAFKA_BROKER', 'localhost:9092')
