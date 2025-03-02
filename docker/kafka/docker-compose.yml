@@ -30,13 +30,11 @@ services:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - kafka
-    entrypoint: [ "sh", "-c" ]
+    entrypoint: ["sh", "-c", "until nc -z -v -w30 kafka 9093; do echo 'Waiting for Kafka...'; sleep 5"]
     command: >
-      "
-      kafka-topics --delete --topic stock_topic --bootstrap-server kafka:9092 ||
+      kafka-topics --delete --topic stock_topic --bootstrap-server kafka:9092 || true
       kafka-topics --create --topic stock_topic --partitions 100 --replication-factor 1 --bootstrap-server kafka:9092 &&
       kafka-topics --describe --topic stock_topic --bootstrap-server kafka:9092
-      "
 
   kafka-producer:
     build:

@@ -32,6 +32,11 @@ os.makedirs(os.path.dirname(shared_path), exist_ok=True)
 
 last_message_time = time.time()
 
+start_time = time.time()  # Start time for throughput calculation
+message_count = 0
+
+# File path to log throughput
+log_file = "consumer_throughput.log"
 try:
     while True:
         # Poll for a message from Kafka
