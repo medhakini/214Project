@@ -24,7 +24,9 @@ for i in range(num_messages):
     stock_price = max(1, stock_price + random_delta) # update stock price, but don't let the price reduce below 1
 
     message = str(stock_price).encode("utf-8")
+    print("from producer:", message)
     
     producer.send(message)
+    print("producer sent message")
 
 client.close()

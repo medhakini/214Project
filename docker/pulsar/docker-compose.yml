@@ -1,31 +1,23 @@
 version: "3.8"
 services:
-  zookeeper:
+  pulsar:
     image: apachepulsar/pulsar:latest
-    container_name: zookeeper
-    command: bin/pulsar zookeeper
-    ports:
-      - "2181:2181"
-
-  pulsar-broker:
-    image: apachepulsar/pulsar:latest
-    container_name: pulsar-broker
-    depends_on:
-      - zookeeper
-    command: >
-      bin/pulsar standalone
+    container_name: pulsar
+    command: ["/bin/bash", "-c", "bin/pulsar standalone & sleep 10 && bin/pulsar-admin namespaces create public/default && bin/pulsar-admin topics create persistent://public/default/my-topic && wait"]
     ports:
       - "6650:6650"
       - "8080:8080"
 
-  pulsar-init:
-    image: apachepulsar/pulsar:latest
-    container_name: pulsar-init
+  pulsar-benchmark:
+    build: .
+    container_name: pulsar-benchmark
     depends_on:
-      - pulsar-broker
-    entrypoint: >
-      /bin/bash -c "
-      bin/pulsar-admin tenants create public &&
-      bin/pulsar-admin namespaces create public/default &&
-      bin/pulsar-admin topics create persistent://public/default/my-topic
-      "
+      - pulsar
+    environment:
+      PULSAR_BROKER: pulsar://pulsar:6650
+      PULSAR_TOPIC: persistent://public/default/my-topic
+      TIMEOUT: 1000
+      NUM_MESSAGES: 1000000
+    volumes:
+      - ./pulsar-benchmark:/app/pulsar-benchmark
+    command: ["bash", "-c", "sleep 10000 && python /app/pulsar-benchmark/pulsar_producer_stocks.py && sleep 10 && python /app/pulsar-benchmark/pulsar_consumer_stocks.py"]

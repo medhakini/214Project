@@ -19,8 +19,11 @@ shared_path = f"shared/pulsar/{topic}.log" # all consumers within the same topic
 
 try:
     while True:
+        print("consumer waiting")
         message = consumer.receive(timeout_millis=timeout) # will block until message is received, or throw exception if timeout occurs before then
         value = float(message.data().decode("utf-8"))
+        print("consumer received message")
+        print("from consumer:", value)
 
         with open(shared_path, "r+") as f:
             # update shared running averages
