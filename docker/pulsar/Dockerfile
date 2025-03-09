@@ -20,7 +20,7 @@ COPY pulsar-benchmark /app/pulsar-benchmark
 # Set environment variables (can be overridden in docker-compose.yml)
 ENV PULSAR_BROKER=pulsar://localhost:6650
 ENV PULSAR_TOPIC=persistent://public/default/my-topic
-ENV TIMEOUT=1000
+ENV TIMEOUT=3000
 ENV NUM_MESSAGES=1000000
 
 # Run the consumer and producer in parallel
