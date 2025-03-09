@@ -1,0 +1,91 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    volumes:
+      - shared_data:/data
+
+  # kafka-setup:
+  #   image: confluentinc/cp-kafka:latest
+  #   depends_on:
+  #     - kafka
+  #   entrypoint: ["sh", "-c", "until nc -z -v -w30 kafka 9093; do echo 'Waiting for Kafka...'; sleep 5"]
+  #   command: >
+  #     kafka-topics --delete --topic stock_topic --bootstrap-server kafka:9092 || true
+  #     kafka-topics --create --topic stock_topic --partitions 100 --replication-factor 1 --bootstrap-server kafka:9092 &&
+  #     kafka-topics --describe --topic stock_topic --bootstrap-server kafka:9092
+
+  kafka-producer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kafka-producer
+    environment:
+      KAFKA_TOPIC: "stock_topic"
+      KAFKA_BROKER: "kafka:9092"
+      NUM_MESSAGES: "50"
+      NUM_PARTITIONS: "100"
+    depends_on:
+      - kafka
+    volumes:
+      - shared_data:/shared
+    command: ["python", "kafka_producer_stocks.py"]
+
+  kafka-consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kafka-consumer
+    environment:
+      KAFKA_TOPIC: "stock_topic"
+      KAFKA_BROKER: "kafka:9092"
+      CONSUMER_GROUP: "consumer-group-1"
+      TIMEOUT: "1000"
+      POLL_INTERVAL: "50"
+    depends_on:
+      - kafka
+    volumes:
+      - shared_data:/shared
+    command: ["python", "kafka_consumer_stocks.py"]
+
+  # kafka-consumer2:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: kafka-consumer2
+  #   environment:
+  #     KAFKA_TOPIC: "stock_topic"
+  #     KAFKA_BROKER: "kafka:9092"
+  #     CONSUMER_GROUP: "consumer-group-1"
+  #     TIMEOUT: "1000"
+  #     POLL_INTERVAL: "50"
+  #   depends_on:
+  #     - kafka
+  #   volumes:
+  #     - shared_data:/shared
+  #   command: ["python", "kafka_consumer_stocks.py"]
+
+volumes:
+  shared_data:
+    driver: local

@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  flink-benchmark:
+    build: .
+    container_name: flink-benchmark-container
+    environment:
+      FLINK_TOPIC: "persistent://public/default/my-topic"
+      NUM_MESSAGES: 1000000
+      TIMEOUT: 1000
+      topic_split: 1
+    volumes:
+      - ./flink-benchmark:/app  # Mount your flink-benchmark directory
+    ports:
+      - "8081:8081"  # Expose Flink Web UI (optional)
+    restart: on-failure
+    # Use the official Flink image
+    image: flink:1.16-scala_2.12
+    entrypoint: ["sh", "-c", "python3 /app/flink_producer_stocks.py & python3 /app/flink_consumer_stocks.py"]
