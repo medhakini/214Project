@@ -2,7 +2,7 @@ import os
 import pulsar
 import fcntl
 
-
+sleep(10)
 # requires the docker file to define the broker
 broker = os.getenv("PULSAR_BROKER", "pulsar://localhost:6650")
 

@@ -3,6 +3,8 @@ import os
 import time
 import fcntl
 
+time.sleep(3)
+print("CONSUMER WOKE UP")
 # requires the docker file to define the topic that each consumer will read from
 topic = os.getenv('KAFKA_TOPIC', 'stock_topic')
 
@@ -29,6 +31,11 @@ consumer = KafkaConsumer(
 
 shared_path = f"shared/kafka/{topic}.log"  # All consumers within the same topic share a file to write the moving average
 os.makedirs(os.path.dirname(shared_path), exist_ok=True)
+try:
+    f = open(shared_path, "x")
+    f.close()
+except FileExistsError:
+    print("File already exists.")
 
 last_message_time = time.time()
 
@@ -44,6 +51,7 @@ try:
 
         # Check if any message is received
         if messages:
+            print("CURRENT MESSAGE: ", messages)
             # Extract the first message from the topic-partition dictionary
             for _, message_list in messages.items():
                 message = message_list[0]
@@ -84,3 +92,5 @@ except KeyboardInterrupt:
     print(f"Shutting down consumer {group}.")
 finally:
     consumer.close()
+
+time.sleep(600)

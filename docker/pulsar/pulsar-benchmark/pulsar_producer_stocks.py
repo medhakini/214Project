@@ -1,7 +1,9 @@
 import os
 import random
 import pulsar
+import time
 
+time.sleep(10)
 # requires the docker file to define the broker
 broker = os.getenv("PULSAR_BROKER", "pulsar://localhost:6650")
 

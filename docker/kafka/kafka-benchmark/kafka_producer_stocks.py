@@ -1,8 +1,10 @@
 from kafka import KafkaProducer
 import os
 import random
+import time
 
-
+time.sleep(3)
+print("I WPKE UP")
 # requires the docker file to define the topic that each producer will write to
 topic = os.getenv('KAFKA_TOPIC', 'stock_topic')
 
@@ -26,10 +28,10 @@ producer = KafkaProducer(
 # produce messages and send them to the topic
 stock_price = max(1, random.random() * 1000) # random stock price greater than 1
 for i in range(num_messages):
+    print("SENDING MESSAGE: ", i)
     random_delta = (random.random() - 0.5) * 2 * stock_price / 1000 # a positive or negative fluctuation in the stock price ranging between -0.1% to +0.1% of the stock price
 
     stock_price = max(1, stock_price + random_delta) # update stock price, but don't let the price reduce below 1
-
     message = str(stock_price).encode("utf-8")
 
     partition_key = (i % num_partitions).to_bytes(4, byteorder='big')
@@ -38,5 +40,7 @@ for i in range(num_messages):
 
 # Ensure all messages are sent before exiting
 producer.flush()
+
+time.sleep(600)
 producer.close()
 

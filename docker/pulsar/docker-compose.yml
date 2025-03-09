@@ -1,45 +1,31 @@
 version: "3.8"
-
 services:
   zookeeper:
-    image: zookeeper:3.7
+    image: apachepulsar/pulsar:latest
     container_name: zookeeper
-    environment:
-      - ZOOKEEPER_CLIENT_PORT=2181
+    command: bin/pulsar zookeeper
     ports:
-      - "2181:2181"  # ZooKeeper default port
+      - "2181:2181"
 
   pulsar-broker:
     image: apachepulsar/pulsar:latest
     container_name: pulsar-broker
-    environment:
-      - PULSAR_ZOOKEEPER_ENABLED=true
-      - PULSAR_OPTS=-Xms2g -Xmx2g  # Set the memory limits for the broker
-    ports:
-      - "6650:6650"  # Pulsar broker port
-      - "8080:8080"  # Pulsar web UI
-    volumes:
-      - ./init_pulsar.sh:/pulsar/bin/init_pulsar.sh
-    entrypoint: ["/bin/bash", "-c", "/pulsar/bin/init_pulsar.sh && bin/pulsar standalone"]
     depends_on:
       - zookeeper
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
+    command: >
+      bin/pulsar standalone
+    ports:
+      - "6650:6650"
+      - "8080:8080"
 
-  pulsar-benchmark:
-    build: .
-    container_name: pulsar-benchmark
+  pulsar-init:
+    image: apachepulsar/pulsar:latest
+    container_name: pulsar-init
     depends_on:
-      pulsar-broker:
-        condition: service_healthy
-    environment:
-      - PULSAR_BROKER=pulsar://pulsar-broker:6650
-      - PULSAR_TOPIC=persistent://public/default/my-topic
-      - NUM_MESSAGES=1000000
-    volumes:
-      - ./pulsar-benchmark:/app/pulsar-benchmark
-    command: ["python", "/app/pulsar-benchmark/pulsar_producer_stocks.py"]
+      - pulsar-broker
+    entrypoint: >
+      /bin/bash -c "
+      bin/pulsar-admin tenants create public &&
+      bin/pulsar-admin namespaces create public/default &&
+      bin/pulsar-admin topics create persistent://public/default/my-topic
+      "
