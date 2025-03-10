@@ -21,7 +21,13 @@ COPY pulsar-benchmark /app/pulsar-benchmark
 ENV PULSAR_BROKER=pulsar://localhost:6650
 ENV PULSAR_TOPIC=persistent://public/default/my-topic
 ENV TIMEOUT=3000
-ENV NUM_MESSAGES=1000000
+ENV NUM_MESSAGES=5
 
-# Run the consumer and producer in parallel
-CMD ["bash", "-c", "python /app/pulsar-benchmark/pulsar_consumer_stocks.py & python /app/pulsar-benchmark/pulsar_producer_stocks.py"]
+# # Run the consumer and producer in parallel
+# CMD ["bash", "-c", "python /app/pulsar-benchmark/pulsar_consumer_stocks.py & python /app/pulsar-benchmark/pulsar_producer_stocks.py"]
+
+ENV NUM_PRODUCERS=3  # Number of producers
+ENV NUM_CONSUMERS=3  # Number of consumers
+
+# Run multiple producers and consumers
+CMD ["bash", "-c", "for i in $(seq 1 $NUM_PRODUCERS); do python /app/pulsar-benchmark/pulsar_producer_stocks.py & done; for i in $(seq 1 $NUM_CONSUMERS); do python /app/pulsar-benchmark/pulsar_consumer_stocks.py & done; wait"]

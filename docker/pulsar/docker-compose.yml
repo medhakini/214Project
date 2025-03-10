@@ -1,7 +1,6 @@
 services:
   pulsar:
     image: apachepulsar/pulsar:latest
-    container_name: pulsar
     command: ["/bin/bash", "-c", "bin/pulsar standalone & sleep 10 && (bin/pulsar-admin namespaces list public | grep -q default || bin/pulsar-admin namespaces create public/default) && (bin/pulsar-admin topics list public/default | grep -q persistent://public/default/my-topic || bin/pulsar-admin topics create persistent://public/default/my-topic) && wait"]
     ports:
       - "6650:6650"
@@ -9,7 +8,6 @@ services:
 
   pulsar-benchmark:
     build: .
-    container_name: pulsar-benchmark
     depends_on:
       - pulsar
     environment:
@@ -20,4 +18,5 @@ services:
     volumes:
       - ./pulsar-benchmark:/app/pulsar-benchmark
       - ./shared:/shared
-    command: ["bash", "-c", "sleep 10 && python /app/pulsar-benchmark/pulsar_producer_stocks.py & python /app/pulsar-benchmark/pulsar_consumer_stocks.py & wait"]
+    deploy:
+      replicas: 3
