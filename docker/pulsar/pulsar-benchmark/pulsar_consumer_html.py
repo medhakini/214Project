@@ -19,10 +19,10 @@ topic = os.getenv("PULSAR_TOPIC", "persistent://public/default/my-topic")
 timeout = int(os.getenv('TIMEOUT', 3000))
 
 # requires the docker file to define the batch timeout in ms, which defines how long the consumer will wait on a small batch before pulling it anyways
-batch_timeout = int(os.getenv('BATCH_TIMEOUT', 3000))
+batch_timeout = int(os.getenv('BATCH_TIMEOUT', 500))
 
 # requires the docker file to define the batch size, which defines how many messages the consumer will wait to collect before pulling them
-batch_size = int(os.getenv('BATCH_SIZE', 3000))
+batch_size = int(os.getenv('BATCH_SIZE', 5))
 
 client = pulsar.Client(broker)
 batch_policy = pulsar.ConsumerBatchReceivePolicy(max_num_message=batch_size, timeout_ms=batch_timeout)
