@@ -3,7 +3,6 @@ import os
 import time
 import fcntl
 
-time.sleep(3)
 print("CONSUMER WOKE UP")
 # requires the docker file to define the topic that each consumer will read from
 topic = os.getenv('KAFKA_TOPIC', 'stock_topic')
@@ -19,6 +18,12 @@ timeout = int(os.getenv('TIMEOUT', 1000)) / 1000  # Convert to seconds
 
 # requires the docker file to define poll interval in ms, which defines how frequently the consumer will poll for a message
 poll_interval = int(os.getenv('POLL_INTERVAL', 50))
+
+def on_assign(consumer, partitions):
+    print("Consumer subscribed to partitions:", partitions)
+    ready_file_path = "/shared/consumer_ready.txt"
+    with open(ready_file_path, "w") as f:
+        f.write("Ready")
 
 # Initialize Kafka consumer
 consumer = KafkaConsumer(
@@ -39,6 +44,8 @@ except FileExistsError:
 
 last_message_time = time.time()
 
+on_assign(consumer, 10)
+
 start_time = time.time()  # Start time for throughput calculation
 message_count = 0
 
@@ -51,7 +58,6 @@ try:
 
         # Check if any message is received
         if messages:
-            print("CURRENT MESSAGE: ", messages)
             # Extract the first message from the topic-partition dictionary
             for _, message_list in messages.items():
                 message = message_list[0]
@@ -92,5 +98,3 @@ except KeyboardInterrupt:
     print(f"Shutting down consumer {group}.")
 finally:
     consumer.close()
-
-time.sleep(600)
