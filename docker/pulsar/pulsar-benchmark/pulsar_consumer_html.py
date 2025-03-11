@@ -55,12 +55,14 @@ last_real_message_time = time.time()
 
 try:
     while True:
+        print("html consumer waiting to receive")
         messages = consumer.batch_receive()
         if len(messages) == 0 and time.time() - last_real_message_time > timeout: # timeout exceeded since last real batch
             raise TimeoutException("Timeout exceeded since last real (nonempty) batch") 
         else:
             last_real_message_time = time.time()
 
+        print("html consumer received message")
         for message in messages:
             message = message.data().decode("utf-8")
 

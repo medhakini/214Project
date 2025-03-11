@@ -34,8 +34,9 @@ producer = client.create_producer(topic)
 
 # produce messages and send them to the topic
 num_messages_sent = 0
-for url in search(query, num=search_query_batch_size, start=search_query_start, pause=search_query_pause, lang="en", country="us"):
+for url in search(query, num_results=search_query_batch_size, start=search_query_start, pause=search_query_pause, lang="en", country="us"):
     try:
+        print("trying in producer html")
         fp = urllib.request.urlopen(url)
         mybytes = fp.read()
 
