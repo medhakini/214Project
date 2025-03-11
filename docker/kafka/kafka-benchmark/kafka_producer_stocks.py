@@ -7,7 +7,7 @@ import time
 # while not os.path.exists(ready_file_path):
 #     print("Waiting for consumer to subscribe...")
 #     time.sleep(1)
-
+time.sleep(3)
 print("I WPKE UP")
 # requires the docker file to define the topic that each producer will write to
 topic = os.getenv('KAFKA_TOPIC', 'stock_topic')
@@ -30,8 +30,7 @@ producer = KafkaProducer(
 # produce messages and send them to the topic
 stock_price = max(1, random.random() * 1000) # random stock price greater than 1
 for i in range(num_messages):
-    if i % 1000 == 0:
-        print("SENDING MESSAGE: ", i)
+    print("SENDING MESSAGE: ", i)
     random_delta = (random.random() - 0.5) * 2 * stock_price / 1000 # a positive or negative fluctuation in the stock price ranging between -0.1% to +0.1% of the stock price
 
     stock_price = max(1, stock_price + random_delta) # update stock price, but don't let the price reduce below 1

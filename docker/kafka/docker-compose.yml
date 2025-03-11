@@ -45,7 +45,7 @@ services:
       KAFKA_TOPIC: "stock_topic"
       KAFKA_BROKER: "kafka:9092"
       NUM_MESSAGES: "50"
-      NUM_PARTITIONS: "100"
+      NUM_PARTITIONS: "1"
     depends_on:
       - kafka
     volumes:
@@ -88,8 +88,8 @@ services:
     volumes:
       - shared_data:/shared
       - ./wait-for-it.sh:/usr/local/bin/wait-for-it  
-    command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_consumer_stocks.py && tail -f /dev/null"]
-    command: ["python", "kafka_consumer_stocks.py"]
+    command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_consumer_stocks.py"]
+    # command: ["python", "kafka_consumer_stocks.py"]
 
   # kafka-consumer2:
   #   build:
