@@ -25,7 +25,7 @@ batch_timeout = int(os.getenv('BATCH_TIMEOUT', 500))
 batch_size = int(os.getenv('BATCH_SIZE', 5))
 
 client = pulsar.Client(broker)
-batch_policy = pulsar.ConsumerBatchReceivePolicy(max_num_message=batch_size, timeout_ms=batch_timeout)
+batch_policy = pulsar.ConsumerBatchReceivePolicy(max_num_message=batch_size, max_num_bytes=-1, timeout_ms=batch_timeout)
 consumer = client.subscribe(topic, subscription_name="my-subscription", consumer_type=pulsar.ConsumerType.Shared, batch_receive_policy=batch_policy)
 
 shared_dir = f"/shared/pulsar"
@@ -64,10 +64,10 @@ try:
 
         print("html consumer received message")
         for message in messages:
-            message = message.data().decode("utf-8")
+            message_data = message.data().decode("utf-8")
 
             # compute sentiment score
-            soup = BeautifulSoup(message, 'html.parser')
+            soup = BeautifulSoup(message_data, 'html.parser')
             
             content = ""
             for para in soup.find_all("p"): 
