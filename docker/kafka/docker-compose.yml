@@ -21,10 +21,13 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_MESSAGE_MAX_BYTES: 10485760
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 10485760
     depends_on:
       - zookeeper
     volumes:
-      - shared_data:/data
+      - ./kafka-benchmark:/app/kafka-benchmark
+      # - shared_data:/shared
 
   # kafka-setup:
   #   image: confluentinc/cp-kafka:latest
@@ -36,23 +39,22 @@ services:
   #     kafka-topics --create --topic stock_topic --partitions 100 --replication-factor 1 --bootstrap-server kafka:9092 &&
   #     kafka-topics --describe --topic stock_topic --bootstrap-server kafka:9092
 
-  kafka-producer:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: kafka-producer
-    environment:
-      KAFKA_TOPIC: "stock_topic"
-      KAFKA_BROKER: "kafka:9092"
-      NUM_MESSAGES: "50"
-      NUM_PARTITIONS: "1"
-    depends_on:
-      - kafka
-    volumes:
-      - shared_data:/shared
-      - ./wait-for-it.sh:/usr/local/bin/wait-for-it  
-    command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_producer_stocks.py"]
-    # command: ["python", "kafka_producer_stocks.py"]
+  # kafka-producer:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: kafka-producer
+  #   environment:
+  #     KAFKA_TOPIC: "stock_topic"
+  #     KAFKA_BROKER: "kafka:9092"
+  #     NUM_MESSAGES: "50"
+  #     NUM_PARTITIONS: "1"
+  #   depends_on:
+  #     - kafka
+  #   volumes:
+  #     - shared_data:/shared
+  #     - ./wait-for-it.sh:/usr/local/bin/wait-for-it  
+  #   command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_producer_stocks.py"]
 
   # kafka-producer2:
   #   build:
@@ -72,24 +74,43 @@ services:
   #   command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_producer_stocks.py"]
   #   # command: ["python", "kafka_producer_stocks.py"]
 
-  kafka-consumer:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: kafka-consumer
-    environment:
-      KAFKA_TOPIC: "stock_topic"
-      KAFKA_BROKER: "kafka:9092"
-      CONSUMER_GROUP: "consumer-group-1"
-      TIMEOUT: "20000"
-      POLL_INTERVAL: "50"
-    depends_on:
-      - kafka
-    volumes:
-      - shared_data:/shared
-      - ./wait-for-it.sh:/usr/local/bin/wait-for-it  
-    command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_consumer_stocks.py"]
-    # command: ["python", "kafka_consumer_stocks.py"]
+  # kafka-consumer:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: kafka-consumer
+  #   environment:
+  #     KAFKA_TOPIC: "stock_topic"
+  #     KAFKA_BROKER: "kafka:9092"
+  #     CONSUMER_GROUP: "consumer-group-1"
+  #     TIMEOUT: "20000"
+  #     POLL_INTERVAL: "50"
+  #   depends_on:
+  #     - kafka
+  #   volumes:
+  #     - shared_data:/shared
+  #     - ./wait-for-it.sh:/usr/local/bin/wait-for-it  
+  #   command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_consumer_stocks.py"]
+
+  # kafka-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: kafka-app
+  #   environment:
+  #     KAFKA_TOPIC: "stock_topic"
+  #     KAFKA_BROKER: "kafka:9092"
+  #     NUM_MESSAGES: "50"
+  #     NUM_PARTITIONS: "1"
+  #     CONSUMER_GROUP: "consumer-group-1"
+  #     TIMEOUT: "20000"
+  #     POLL_INTERVAL: "50"
+  #   depends_on:
+  #     - kafka
+  #   volumes:
+  #     - shared_data:/shared
+  #     - ./wait-for-it.sh:/usr/local/bin/wait-for-it
+  #   command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_producer_stocks.py & wait-for-it kafka:9092 -- python kafka_consumer_stocks.py"]
 
   # kafka-consumer2:
   #   build:

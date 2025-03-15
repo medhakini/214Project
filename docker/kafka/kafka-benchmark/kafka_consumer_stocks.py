@@ -14,7 +14,7 @@ broker = os.getenv('KAFKA_BROKER', 'localhost:9092')
 group = os.getenv('CONSUMER_GROUP', "consumer-group-1")
 
 # requires the docker file to define timeout in ms, which defines how long the consumer will wait after receiving its last message to terminate
-timeout = int(os.getenv('TIMEOUT', 1000)) / 1000  # Convert to seconds
+timeout = int(os.getenv('TIMEOUT', 1000))  # Convert to seconds
 
 # requires the docker file to define poll interval in ms, which defines how frequently the consumer will poll for a message
 poll_interval = int(os.getenv('POLL_INTERVAL', 50))
@@ -28,7 +28,7 @@ def on_assign(consumer, partitions):
 # Initialize Kafka consumer
 consumer = KafkaConsumer(
     topic,
-    bootstrap_servers=broker,
+    bootstrap_servers="kafka:9092",
     group_id=group,
     auto_offset_reset='earliest',
     enable_auto_commit=True
@@ -44,7 +44,7 @@ except FileExistsError:
 
 last_message_time = time.time()
 
-on_assign(consumer, 10)
+# on_assign(consumer, 10)
 
 start_time = time.time()  # Start time for throughput calculation
 message_count = 0
@@ -63,7 +63,7 @@ try:
                 message = message_list[0]
                 if message:
                     value = float(message.value.decode("utf-8"))
-
+                    print(message)
                     with open(shared_path, "r+") as f:
                         # Lock the file for safe access
                         fcntl.flock(f, fcntl.LOCK_EX)
