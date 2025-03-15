@@ -52,7 +52,8 @@ class TimeoutException(Exception):
     pass
 
 last_real_message_time = time.time()
-
+start = time.time()
+cnt = 1
 try:
     while True:
         print("html consumer waiting to receive")

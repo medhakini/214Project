@@ -26,7 +26,7 @@ search_query_batch_size = int(os.getenv('QUERY_BATCH_SIZE', 10))    # tells the 
 # search_query_pause = int(os.getenv('QUERY_PAUSE', 2))      # tells the search engine to wait 2 seconds between queries to google search. If we make this too small, our IP might be blocked
 
 # requires the docker file to define the country whose news we will scrape
-country = os.getenv('QUERY_COUNTRY', "Ukraine")
+country = os.getenv('QUERY_COUNTRY', "Portugal")
 query = f"{country} news"
 
 client = pulsar.Client(broker)
@@ -44,12 +44,14 @@ while True:
             html_page = mybytes.decode("utf8")
             fp.close()
 
+            print("BENCHMARK HTML PRODUCER MESSAGE", num_messages_sent, " TIME:", time.time()-start)
+
             producer.send(html_page)
             num_messages_sent += 1
             if num_messages_sent >= num_messages:
                 break
             
-            time.sleep(0.5)
+            time.sleep(3)
 
         except Exception as e:
             print("No access to this webpage, trying the next one...")
