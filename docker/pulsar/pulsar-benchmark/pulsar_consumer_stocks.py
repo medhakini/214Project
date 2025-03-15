@@ -29,14 +29,11 @@ if not os.path.exists(shared_path):
         f.write("0\n0\n")
     print("file created")
 
-cnt = 0
-start = time.time()
 try:
     while True:
         message = consumer.receive(timeout_millis=timeout)
         value = float(message.data().decode("utf-8"))
-        print("BENCHMARK STOCK CONSUMER MESSAGE", cnt, " TIME:", time.time()-start)
-        cnt += 1
+        print("consumer received message")
         print("from consumer:", value)
 
         with open(shared_path, "r+") as f:

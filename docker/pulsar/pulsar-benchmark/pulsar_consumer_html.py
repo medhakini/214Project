@@ -52,7 +52,7 @@ class TimeoutException(Exception):
     pass
 
 last_real_message_time = time.time()
-start = time.time()
+
 try:
     while True:
         print("html consumer waiting to receive")
@@ -63,7 +63,6 @@ try:
             last_real_message_time = time.time()
 
         print("html consumer received message")
-        cnt = 1
         for message in messages:
             message_data = message.data().decode("utf-8")
 
@@ -100,8 +99,6 @@ try:
                     fcntl.flock(f, fcntl.LOCK_UN)  # Unlock file
             
             consumer.acknowledge(message)
-            print("BENCHMARK HTML CONSUMER MESSAGE", cnt, " TIME:", time.time()-start)
-            cnt += 1
 except Exception as e:
     print(f"Shutting down pulsar consumer. Error: {e}")
 finally:
