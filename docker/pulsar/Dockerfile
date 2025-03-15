@@ -22,9 +22,9 @@ ENV PULSAR_BROKER=pulsar://localhost:6650
 ENV PULSAR_TOPIC=persistent://public/default/my-topic
 ENV TIMEOUT=3000
 ENV NUM_MESSAGES=1000000
-ENV NUM_PRODUCERS=3
-ENV NUM_CONSUMERS=3
+ENV NUM_PRODUCERS=4
+ENV NUM_CONSUMERS=4
 
 # Run multiple producers and consumers
-# CMD ["bash", "-c", "for i in $(seq 1 $NUM_PRODUCERS); do python /app/pulsar-benchmark/pulsar_producer_stocks.py & done; for i in $(seq 1 $NUM_CONSUMERS); do python /app/pulsar-benchmark/pulsar_consumer_stocks.py & done; wait"]
-CMD ["bash", "-c", "for i in $(seq 1 $NUM_PRODUCERS); do python /app/pulsar-benchmark/pulsar_producer_stocks.py & python /app/pulsar-benchmark/pulsar_producer_html.py & done; for i in $(seq 1 $NUM_CONSUMERS); do python /app/pulsar-benchmark/pulsar_consumer_stocks.py & python /app/pulsar-benchmark/pulsar_consumer_html.py & done; wait"]
+CMD ["bash", "-c", "for i in $(seq 1 $NUM_PRODUCERS); do python /app/pulsar-benchmark/pulsar_producer_stocks.py & done; for i in $(seq 1 $NUM_CONSUMERS); do python /app/pulsar-benchmark/pulsar_consumer_stocks.py & done; wait"]
+#CMD ["bash", "-c", "for i in $(seq 1 $NUM_PRODUCERS); do python /app/pulsar-benchmark/pulsar_producer_stocks.py & python /app/pulsar-benchmark/pulsar_producer_html.py & done; for i in $(seq 1 $NUM_CONSUMERS); do python /app/pulsar-benchmark/pulsar_consumer_stocks.py & python /app/pulsar-benchmark/pulsar_consumer_html.py & done; wait"]

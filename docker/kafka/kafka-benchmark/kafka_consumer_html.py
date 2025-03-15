@@ -16,16 +16,16 @@ def analyze_sentiment(text):
 time.sleep(3)
 print("CONSUMER WOKE UP")
 # requires the docker file to define the topic that each consumer will read from
-topic = os.getenv('KAFKA_TOPIC', 'stock_topic')
+topic = os.getenv('KAFKA_TOPIC', 'html_topic')
 
 # requires the docker file to define the broker
-broker = os.getenv('KAFKA_BROKER', 'localhost:9092')
+broker = os.getenv('KAFKA_BROKER', 'kafka:9092')
 
 # requires the docker file to define group that this consumer belongs to
 group = os.getenv('CONSUMER_GROUP', "consumer-group-1")
 
 # requires the docker file to define timeout in ms, which defines how long the consumer will wait after receiving its last message to terminate
-timeout = int(os.getenv('TIMEOUT', 1000)) / 1000  # Convert to seconds
+timeout = int(os.getenv('TIMEOUT', 1000)) # Convert to seconds
 
 # requires the docker file to define poll interval in ms, which defines how frequently the consumer will poll for a message
 poll_interval = int(os.getenv('POLL_INTERVAL', 50))
