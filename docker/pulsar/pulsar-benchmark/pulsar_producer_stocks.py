@@ -17,6 +17,7 @@ client = pulsar.Client(broker)
 producer = client.create_producer(topic)
 
 # produce messages and send them to the topic
+start = time.time()
 stock_price = max(1, random.random() * 1000) # random stock price greater than 1
 for i in range(num_messages):
     random_delta = (random.random() - 0.5) * 2 * stock_price / 1000 # a positive or negative fluctuation in the stock price ranging between -0.1% to +0.1% of the stock price
@@ -27,6 +28,6 @@ for i in range(num_messages):
     print("from producer:", message)
     
     producer.send(message)
-    print("producer sent message")
+    print("BENCHMARK STOCK PRODUCER MESSAGE", i, " TIME:", time.time()-start)
 
 client.close()
