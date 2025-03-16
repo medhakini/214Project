@@ -14,5 +14,3 @@ docker ps --> shows running containers
 ## For multiple producers and consumers
 - Default is 3
 - Can dynamically change this by running **docker-compose up --scale pulsar-benchmark=n** where n is the number you want. This will override the yml but please update the Dockerfile
-
-## For Pulsar
