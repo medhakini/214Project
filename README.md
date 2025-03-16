@@ -1,4 +1,4 @@
-# 214 Project: Benchmarking with Kafka, Pulsar, and Flink
+# 214 Project: Benchmarking with Kafka and Pulsar
 
 ## Steps to Set Up Docker
 ** make sure docker and docker compose is installed (might need docker desktop) **
