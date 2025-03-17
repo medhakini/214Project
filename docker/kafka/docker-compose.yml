@@ -74,23 +74,23 @@ services:
   #   command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_producer_stocks.py"]
   #   # command: ["python", "kafka_producer_stocks.py"]
 
-  kafka-consumer:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: kafka-consumer
-    environment:
-      KAFKA_TOPIC: "stock_topic"
-      KAFKA_BROKER: "kafka:9092"
-      CONSUMER_GROUP: "consumer-group-1"
-      TIMEOUT: "20000"
-      POLL_INTERVAL: "50"
-    depends_on:
-      - kafka
-    volumes:
-      - shared_data:/shared
-      - ./wait-for-it.sh:/usr/local/bin/wait-for-it  
-    command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_consumer_stocks.py"]
+  # kafka-consumer:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: kafka-consumer
+  #   environment:
+  #     KAFKA_TOPIC: "stock_topic"
+  #     KAFKA_BROKER: "kafka:9092"
+  #     CONSUMER_GROUP: "consumer-group-1"
+  #     TIMEOUT: "20000"
+  #     POLL_INTERVAL: "50"
+  #   depends_on:
+  #     - kafka
+  #   volumes:
+  #     - shared_data:/shared
+  #     - ./wait-for-it.sh:/usr/local/bin/wait-for-it  
+  #   command: ["sh", "-c", "wait-for-it kafka:9092 -- python kafka_consumer_stocks.py"]
     # command: ["python", "kafka_consumer_stocks.py"]
 
   # kafka-consumer2:

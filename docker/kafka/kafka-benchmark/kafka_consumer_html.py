@@ -43,7 +43,7 @@ consumer = KafkaConsumer(
     max_poll_records=batch_size
 )
 
-shared_path = f"shared/kafka/{topic}.log"  # All consumers within the same topic share a file to write the sentiment score
+shared_path = f"app/kafka/{topic}.log"  # All consumers within the same topic share a file to write the sentiment score
 os.makedirs(os.path.dirname(shared_path), exist_ok=True)
 try:
     f = open(shared_path, "x")
@@ -64,41 +64,43 @@ try:
         messages = consumer.poll(timeout_ms=poll_interval)
 
         # Check if any message is received
+        i = 0
         if messages:
-            print("CURRENT MESSAGE: ", messages)
             for _, message_list in messages.items():
-                for message in message_list:
-                    if message:
-                        soup = BeautifulSoup(message, 'html.parser')
-            
-                        content = ""
-                        for para in soup.find_all("p"): 
-                            content += para.get_text()
+                # for message in message_list:
+                message = message_list[0]
+                new_message = message.value.decode("utf8")
+                print("BENCHMARK HTML CONSUMER MESSAGE", i, " TIME:", time.time())
+                i += 1
+                if message:
+                    soup = BeautifulSoup(new_message, 'html.parser')
+                    content = ""
+                    for para in soup.find_all("p"): 
+                        content += para.get_text()
 
-                        sentiment_score = analyze_sentiment(content)
+                    sentiment_score = analyze_sentiment(content)
 
-                        with open(shared_path, "r+") as f:
-                            # Lock the file for safe access
-                            fcntl.flock(f, fcntl.LOCK_EX)
+                    with open(shared_path, "r+") as f:
+                        # Lock the file for safe access
+                        fcntl.flock(f, fcntl.LOCK_EX)
 
-                            lines = f.readlines()  # Read all lines
-                            if not lines:
-                                shared_sentiment_score = 0
-                            else:
-                                shared_sentiment_score = float(lines[0].strip())
+                        lines = f.readlines()  # Read all lines
+                        if not lines:
+                            shared_sentiment_score = 0
+                        else:
+                            shared_sentiment_score = float(lines[0].strip())
 
-                            # Update the running averages
-                            shared_sentiment_score += sentiment_score
+                        # Update the running averages
+                        shared_sentiment_score += sentiment_score
+                        print(sentiment_score)
 
+                        # Replace first line with new data and write back
+                        f.seek(0)
+                        f.writelines([f"{shared_sentiment_score}"])
+                        f.truncate()  # Remove any leftover content
+                        fcntl.flock(f, fcntl.LOCK_UN)  # Unlock the file
 
-                            # Replace first line with new data and write back
-                            f.seek(0)
-                            f.writelines([f"{shared_sentiment_score}"])
-                            f.truncate()  # Remove any leftover content
-                            fcntl.flock(f, fcntl.LOCK_UN)  # Unlock the file
-
-                        last_message_time = time.time()  # Reset timer on new message
-
+                    last_message_time = time.time()  # Reset timer on new message
         else:
             # Check if the inactivity timeout has been exceeded
             if time.time() - last_message_time > timeout:
@@ -109,5 +111,3 @@ except KeyboardInterrupt:
     print(f"Shutting down consumer {group}.")
 finally:
     consumer.close()
-
-time.sleep(600)

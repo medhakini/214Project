@@ -12,7 +12,7 @@ html_latencies = []
 with open("times11.txt", "r") as f:
     for l in f:
         l = l.split(" ")
-
+        print(l)
         if l[4] == "STOCK" and l[5] == "CONSUMER":
             try:
                 t = float(l[10][:-2])
@@ -38,12 +38,12 @@ with open("times11.txt", "r") as f:
             except:
                 pass
 
-for i in stock_cons_rec:
-    if i in stock_prod_sent:
-        stock_latencies.append(stock_cons_rec[i] - stock_prod_sent[i])
-for i in html_cons_rec:
-    if int(i) > 5 and str(int(i)-5) in html_cons_rec:
-        html_latencies.append(html_cons_rec[i] + random.randint(1, 100) - html_cons_rec[str(int(i)-5)])
+# for i in stock_cons_rec:
+#     if i in stock_prod_sent:
+#         stock_latencies.append(stock_cons_rec[i] - stock_prod_sent[i])
+# for i in html_cons_rec:
+#     if int(i) > 5 and str(int(i)-5) in html_cons_rec:
+#         html_latencies.append(html_cons_rec[i] + random.randint(1, 100) - html_cons_rec[str(int(i)-5)])
 
 
 

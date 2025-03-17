@@ -5,17 +5,17 @@ import fcntl
 
 print("CONSUMER WOKE UP")
 # requires the docker file to define the topic that each consumer will read from
-topic = os.getenv('KAFKA_TOPIC', 'stock_topic')
+topic = os.getenv('KAFKA_TOPIC', 'stock_topic2')
 
 # requires the docker file to define the broker
-broker = os.getenv('KAFKA_BROKER', 'localhost:9092')
+broker = os.getenv('KAFKA_BROKER', 'kafka:9092')
 
 # requires the docker file to define group that this consumer belongs to
-group = os.getenv('CONSUMER_GROUP', "consumer-group-1")
+group = os.getenv('CONSUMER_GROUP', "consumer-group-2")
 
 # requires the docker file to define timeout in ms, which defines how long the consumer will wait after receiving its last message to terminate
-timeout = int(os.getenv('TIMEOUT', 1000)) / 1000  # Convert to seconds
-
+timeout = int(os.getenv('TIMEOUT', 1000)) # Convert to seconds
+timeout = 10
 # requires the docker file to define poll interval in ms, which defines how frequently the consumer will poll for a message
 poll_interval = int(os.getenv('POLL_INTERVAL', 50))
 
@@ -44,12 +44,11 @@ except FileExistsError:
 
 last_message_time = time.time()
 
-on_assign(consumer, 10)
-
 start_time = time.time()  # Start time for throughput calculation
 message_count = 0
 
 # File path to log throughput
+i = 0
 log_file = "consumer_throughput.log"
 try:
     while True:
@@ -61,6 +60,8 @@ try:
             # Extract the first message from the topic-partition dictionary
             for _, message_list in messages.items():
                 message = message_list[0]
+                print("BENCHMARK STOCK CONSUMER MESSAGE", i, " TIME:", time.time())
+
                 if message:
                     value = float(message.value.decode("utf-8"))
 
@@ -85,7 +86,7 @@ try:
                         f.writelines([f"{running_average_50}\n", f"{running_average_200}\n"])
                         f.truncate()  # Remove any leftover content
                         fcntl.flock(f, fcntl.LOCK_UN)  # Unlock the file
-
+                    i += 1
                     last_message_time = time.time()  # Reset timer on new message
 
         else:

@@ -42,6 +42,7 @@ producer = KafkaProducer(
 
 # produce messages and send them to the topic
 num_messages_sent = 0
+i = 0
 for url in search(query, num_results=search_query_batch_size,lang="en", unique=True, region="us", sleep_interval=2):
     html_page = b"a" * 1000
     try:
@@ -52,15 +53,15 @@ for url in search(query, num_results=search_query_batch_size,lang="en", unique=T
 
         html_page = mybytes.decode("utf8")
         print(f"Message size: {sys.getsizeof(html_page)} bytes")
+
         fp.close()
     except Exception as e:
         print("No access to this webpage, trying the next one...")
         print(e)
     try:
-        if html_page == b"a" * 1000:
-            print("default message sent")
         partition_key = (num_messages_sent % num_partitions).to_bytes(4, byteorder='big')
-        producer.send(topic, key=partition_key, value=html_page)
+        print("BENCHMARK HTML PRODUCER MESSAGE", i, " TIME:", time.time())
+        future = producer.send(topic, key=partition_key, value=mybytes)
         num_messages_sent += 1
         if num_messages_sent >= num_messages:
             break
@@ -68,6 +69,7 @@ for url in search(query, num_results=search_query_batch_size,lang="en", unique=T
         print("couldn't send to consumer..")
         print(e)
     time.sleep(0.5)
+    i += 1
 
 # Ensure all messages are sent before exiting
 producer.flush()
